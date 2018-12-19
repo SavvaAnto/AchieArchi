@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>AchieArchi</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+
+        <h1>Achievements' archive</h1>
+
+        <h2 id="achiearchi"></h2>
+
+        <label for="name" class="col-lg-2 control-label">New achievement</label>
+        <input id="title" type="text">
+
+        <label for="name" class="col-lg-2 control-label">Description</label>
+        <input id="description" type="text">
+
+        <button id="button" onClick="window.location.reload()">Record</button>
+
+    </div>
+
+    <div id="log">
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+
+        function timeConverter(_timestamp){
+            var a = new Date(_timestamp * 1000);
+            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            var year = a.getFullYear();
+            var month = months[a.getMonth()];
+            var date = a.getDate();
+            var hour = a.getHours();
+            var min = a.getMinutes();
+            var sec = a.getSeconds();
+            var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+            return time;
+        }
+
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        }
+
+        web3.eth.defaultAccount = web3.eth.accounts[0];
+
+        var AchieArchiContract = web3.eth.contract([
+            {
+                "constant": false,
+                "inputs": [
+                    {
+                        "name": "_title",
+                        "type": "string"
+                    },
+                    {
+                        "name": "_description",
+                        "type": "string"
+                    }
+                ],
+                "name": "addAchievement",
+                "outputs": [],
+                "payable": false,
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "name": "achieId",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "name": "achieDate",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "name": "achieTitle",
+                        "type": "string"
+                    },
+                    {
+                        "indexed": false,
+                        "name": "achieDescription",
+                        "type": "string"
+                    }
+                ],
+                "name": "NewAchievement",
+                "type": "event"
+            },
+            {
+                "constant": true,
+                "inputs": [
+                    {
+                        "name": "_id",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "getAchievement",
+                "outputs": [
+                    {
+                        "name": "achieDate",
+                        "type": "uint256"
+                    },
+                    {
+                        "name": "achieTitle",
+                        "type": "string"
+                    },
+                    {
+                        "name": "achieDescription",
+                        "type": "string"
+                    }
+                ],
+                "payable": false,
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "getLengthOfList",
+                "outputs": [
+                    {
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "payable": false,
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ]);
+
+        var AchieArchi = AchieArchiContract.at('0x00767c7f9c18fb8fbeda1ea89a9f305c13bf9d77');
+
+        var achieNum = AchieArchi.getLengthOfList();
+
+        var lastOne = AchieArchi.getAchievement(achieNum - 1);
+        $("#achiearchi").html("Last achievement <br> Date: " + timeConverter(lastOne[0]) + "<br>Title: " + lastOne[1] + "<br>Description: " + lastOne[2]);
+
+        for (var i = 0; i < achieNum; i++) {
+                var result = AchieArchi.getAchievement(i);
+                var p = document.createElement("p");
+                var node = document.createTextNode("Date: " + timeConverter(result[0]) + " Title: " + result[1] + " Description: " + result[2]);
+                p.appendChild(node);
+                var div = document.getElementById("log");
+                div.appendChild(p);
+        }
+
+        $("button").click(function() {
+            AchieArchi.addAchievement(($("#title").val()), $("#description").val(), {from: web3.eth.defaultAccount, gas: 2000000});
+        })
+
+    </script>
+
+</body>
+</html>
