@@ -16,8 +16,10 @@ contract AchieArchi {
     
     function addAchievement(string memory _title, string memory _description) public {
         
+        listOfAchievments.push(Achievement(now, _title, _description));
+        
         uint id = listOfAchievments.push(Achievement(now, _title, _description)) - 1;
-      
+        
         emit NewAchievement(id, listOfAchievments[id].date, listOfAchievments[id].title, listOfAchievments[id].description);
         
     }
@@ -28,6 +30,10 @@ contract AchieArchi {
         achieTitle = listOfAchievments[_id].title;
         achieDescription = listOfAchievments[_id].description;
 
+    }
+    
+    function getLengthOfList() public view returns(uint) {
+        return listOfAchievments.length;
     }
     
 }
