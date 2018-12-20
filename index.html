@@ -58,108 +58,112 @@
         web3.eth.defaultAccount = web3.eth.accounts[0];
 
         var AchieArchiContract = web3.eth.contract([
-            {
-                "constant": false,
-                "inputs": [
-                    {
-                        "name": "_title",
-                        "type": "string"
-                    },
-                    {
-                        "name": "_description",
-                        "type": "string"
-                    }
-                ],
-                "name": "addAchievement",
-                "outputs": [],
-                "payable": false,
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": false,
-                        "name": "achieId",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "name": "achieDate",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "name": "achieTitle",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": false,
-                        "name": "achieDescription",
-                        "type": "string"
-                    }
-                ],
-                "name": "NewAchievement",
-                "type": "event"
-            },
-            {
-                "constant": true,
-                "inputs": [
-                    {
-                        "name": "_id",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "getAchievement",
-                "outputs": [
-                    {
-                        "name": "achieDate",
-                        "type": "uint256"
-                    },
-                    {
-                        "name": "achieTitle",
-                        "type": "string"
-                    },
-                    {
-                        "name": "achieDescription",
-                        "type": "string"
-                    }
-                ],
-                "payable": false,
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "constant": true,
-                "inputs": [],
-                "name": "getLengthOfList",
-                "outputs": [
-                    {
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "payable": false,
-                "stateMutability": "view",
-                "type": "function"
-            }
-        ]);
+                {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "getLengthOfList",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_title",
+                            "type": "string"
+                        },
+                        {
+                            "name": "_description",
+                            "type": "string"
+                        }
+                    ],
+                    "name": "addAchievement",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "constant": true,
+                    "inputs": [
+                        {
+                            "name": "_id",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "getAchievement",
+                    "outputs": [
+                        {
+                            "name": "achieDate",
+                            "type": "uint256"
+                        },
+                        {
+                            "name": "achieTitle",
+                            "type": "string"
+                        },
+                        {
+                            "name": "achieDescription",
+                            "type": "string"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": false,
+                            "name": "achieId",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "name": "achieDate",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "name": "achieTitle",
+                            "type": "string"
+                        },
+                        {
+                            "indexed": false,
+                            "name": "achieDescription",
+                            "type": "string"
+                        }
+                    ],
+                    "name": "NewAchievement",
+                    "type": "event"
+                }
+            ]);
 
-        var AchieArchi = AchieArchiContract.at('0x00767c7f9c18fb8fbeda1ea89a9f305c13bf9d77');
+        var AchieArchi = AchieArchiContract.at('0x334be651bfddaf7c79232ca93cd4f5a21d205b6f');
 
         var achieNum = AchieArchi.getLengthOfList();
 
-        var lastOne = AchieArchi.getAchievement(achieNum - 1);
-        $("#achiearchi").html("Last achievement <br> Date: " + timeConverter(lastOne[0]) + "<br>Title: " + lastOne[1] + "<br>Description: " + lastOne[2]);
+        if (achieNum == 0) {
+            $("#achiearchi").html("Record your first achievement!");
+        } else {
+            var lastOne = AchieArchi.getAchievement(achieNum - 1);
+            $("#achiearchi").html("Last achievement <br> Date: " + timeConverter(lastOne[0]) + "<br>Title: " + lastOne[1] + "<br>Description: " + lastOne[2]);
 
-        for (var i = 0; i < achieNum; i++) {
-                var result = AchieArchi.getAchievement(i);
-                var p = document.createElement("p");
-                var node = document.createTextNode("Date: " + timeConverter(result[0]) + " Title: " + result[1] + " Description: " + result[2]);
-                p.appendChild(node);
-                var div = document.getElementById("log");
-                div.appendChild(p);
+            for (var i = 0; i < achieNum; i++) {
+                    var result = AchieArchi.getAchievement(i);
+                    var p = document.createElement("p");
+                    var node = document.createTextNode("Date: " + timeConverter(result[0]) + " Title: " + result[1] + " Description: " + result[2]);
+                    p.appendChild(node);
+                    var div = document.getElementById("log");
+                    div.appendChild(p);
+            }
         }
 
         $("button").click(function() {
